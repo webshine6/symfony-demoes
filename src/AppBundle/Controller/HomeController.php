@@ -5,10 +5,11 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Article;
 use AppBundle\Form\ArticleType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+
 
 
 class HomeController extends Controller
@@ -19,28 +20,42 @@ class HomeController extends Controller
      */
     public function indexAction()
     {
-        return $this->render('default/index.html.twig');
+        $article = new Article();
+        $form = $this->createForm(ArticleType::class, $article);
+        $form->add('submit', SubmitType::class);
+
+        return $this->render('default/index.html.twig', array(
+            'form' => $form->createView()
+        ));
     }
+
 
     /**
      * @Route("/", name="create_article_process")
      * @Method("POST")
+     *
      * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function createArticleProcess(Request $request)
+    public function createArticleAction(Request $request)
     {
-       $article = new Article();
-       $article->setCreatedOn(new \DateTime('now'));
+        $article = new Article();
+        $article->setCreatedOn(new \DateTime('now'));
 
-       $form = $this->createForm(ArticleType::class, $article);
-       $form->handleRequest($request);
+        $form = $this->createForm(ArticleType::class, $article);
+        $form->add('submit', SubmitType::class);
 
-       if ($form->isValid()) {
-           var_dump($article);
-           exit;
-       }
+        $form->handleRequest($request);
 
-      var_dump($form->getErrors(true, false));
-      exit;
+        if ($form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($article);
+            $em->flush();
+
+            var_dump($article);
+            exit;
+        }
+
     }
+
 }

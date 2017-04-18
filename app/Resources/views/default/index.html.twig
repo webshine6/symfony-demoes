@@ -4,18 +4,9 @@
 
     <h1>Create your article</h1>
 
-    <form method="post">
-        <div>
-            Title: <input type="text" name="article[title]">
-        </div>
-        <div>
-            Body: <textarea name="article[body]" cols="20" rows="5"></textarea>
-        </div>
-        <div>
-            <input type="submit" value="Create">
-        </div>
-    </form>
-
+    {{ form_start(form) }}
+    {{ form_widget(form) }}
+    {{ form_end(form) }}
 
     <a href="{{ path('all_articles') }}">Show All Articles</a>
 {% endblock %}
